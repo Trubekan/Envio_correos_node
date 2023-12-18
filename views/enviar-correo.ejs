@@ -1,0 +1,23 @@
+<!-- views/enviar-correo.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enviar Correo</title>
+</head>
+<body>
+  <h1>Datos de los Alumnos</h1>
+
+  <% alumnos.forEach((alumno) => { %>
+    <div>
+      <h2>Nombre del Alumno: <%= alumno.alumno %></h2>
+      <p>Correo: <%= alumno.correo %></p>
+      <p>Semana: <%= alumno.sem11 || alumno.sem10 || alumno.sem8 || 'No hay puntaje disponible' %></p>
+      <hr>
+    </div>
+  <% }); %>
+
+</body>
+</html>
