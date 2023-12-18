@@ -20,13 +20,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Función para enviar correo personalizado
 const enviarCorreoPersonalizado = async (alumno) => {
   const mailOptions = {
     from: 'trubekanvh@gmail.com',
     to: alumno.correo,
     subject: 'Asunto del correo',
-    text: `Hola ${alumno.alumno}, este es un mensaje personalizado para ti. Tus incidentes es: ${alumno.sem11 || alumno.sem16 || alumno.sem8 || 'No hay puntaje disponible'}.`,
+    text: `Hola ${alumno.alumno}, este es un mensaje personalizado para ti. Tus incidentes en la semana ${alumno.semana} son: ${alumno.incidentes || 'No hay puntaje disponible'}.`,
   };
 
   try {
@@ -36,6 +35,7 @@ const enviarCorreoPersonalizado = async (alumno) => {
     console.error(`Error al enviar el correo a ${alumno.alumno}:`, error);
   }
 };
+
 
 // Enviar correo inicial al iniciar la aplicación
 app.listen(PORT, () => {
@@ -47,44 +47,46 @@ app.listen(PORT, () => {
 app.get('/', async (req, res) => {
   try {
     // Consumir la API
-    const response = await axios.get('http://ip172-18-0-30-clvmg4dnp9tg00fmvg80-5000.direct.labs.play-with-docker.com/resultados');
+    const response = await axios.get('http://ip172-18-0-95-cm03mddnp9tg008ikijg-5000.direct.labs.play-with-docker.com/resultados');
     const alumnos = response.data;
 
     // Renderizar formulario con Bootstrap
     const formHtml = `
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <title>Visualizar Alumnos</title>
-      </head>
-      <body class="container mt-5">
-        <h1>Datos de Alumnos</h1>
-        <table class="table">
-          <thead>
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      <title>Visualizar Alumnos</title>
+    </head>
+    <body class="container mt-5">
+      <h1>Datos de Alumnos</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Semana</th>
+            <th>Incidentes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${alumnos.map(alumno => `
             <tr>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Incidentes</th>
+              <td>${alumno.alumno}</td>
+              <td>${alumno.correo}</td>
+              <td>${alumno.semana}</td>
+              <td>${alumno.incidentes || 'No hay puntaje disponible'}</td>
             </tr>
-          </thead>
-          <tbody>
-            ${alumnos.map(alumno => `
-              <tr>
-                <td>${alumno.alumno}</td>
-                <td>${alumno.correo}</td>
-                <td>${alumno.sem11 || alumno.sem16 || alumno.sem8 || 'No hay puntaje disponible'}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <form action="/enviar-correos" method="get">
-          <button class="btn btn-primary" type="submit">Enviar Correos</button>
-        </form>
-      </body>
-      </html>
+          `).join('')}
+        </tbody>
+      </table>
+      <form action="/enviar-correos" method="get">
+        <button class="btn btn-primary" type="submit">Enviar Correos</button>
+      </form>
+    </body>
+    </html>
     `;
 
     res.send(formHtml);
@@ -94,11 +96,12 @@ app.get('/', async (req, res) => {
   }
 });
 
+
 // Ruta para enviar correos ("/enviar-correos")
 app.get('/enviar-correos', async (req, res) => {
   try {
     // Consumir la API
-    const response = await axios.get('http://ip172-18-0-30-clvmg4dnp9tg00fmvg80-5000.direct.labs.play-with-docker.com/resultados');
+    const response = await axios.get('http://ip172-18-0-95-cm03mddnp9tg008ikijg-5000.direct.labs.play-with-docker.com/resultados');
     const alumnos = response.data;
 
     // Recorrer la lista de alumnos y enviar correos personalizados
